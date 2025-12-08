@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TravelGo - Your one-stop destination for booking hotels and flights">
+    <title>TravelGo - Book Hotels & Flights</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <h1>✈️ TravelGo</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#hotels">Hotels</a></li>
+                    <li><a href="#flights">Flights</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Explore the World with TravelGo</h1>
+            <p class="hero-subtitle">Book amazing hotels and flights at the best prices</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="scrollToSection('hotels')">Book Hotels</button>
+                <button class="btn btn-secondary" onclick="scrollToSection('flights')">Book Flights</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hotel Booking Section -->
+    <section id="hotels" class="booking-section">
+        <div class="container">
+            <h2 class="section-title">🏨 Hotel Booking</h2>
+            <p class="section-subtitle">Find and book your perfect stay</p>
+            
+            <div class="booking-card">
+                <form id="hotelBookingForm" class="booking-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelDestination">Destination</label>
+                            <input type="text" id="hotelDestination" name="destination" placeholder="Where are you going?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelGuests">Number of Guests</label>
+                            <select id="hotelGuests" name="guests" required>
+                                <option value="">Select guests</option>
+                                <option value="1">1 Guest</option>
+                                <option value="2">2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5+">5+ Guests</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelCheckIn">Check-in Date</label>
+                            <input type="date" id="hotelCheckIn" name="checkIn" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelCheckOut">Check-out Date</label>
+                            <input type="date" id="hotelCheckOut" name="checkOut" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelRoomType">Room Type</label>
+                            <select id="hotelRoomType" name="roomType" required>
+                                <option value="">Select room type</option>
+                                <option value="single">Single Room</option>
+                                <option value="double">Double Room</option>
+                                <option value="suite">Suite</option>
+                                <option value="deluxe">Deluxe Room</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelName">Your Name</label>
+                            <input type="text" id="hotelName" name="name" placeholder="Full Name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelEmail">Email</label>
+                            <input type="email" id="hotelEmail" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelPhone">Phone Number</label>
+                            <input type="tel" id="hotelPhone" name="phone" placeholder="+1 234 567 8900" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Search Hotels</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flight Booking Section -->
+    <section id="flights" class="booking-section">
+        <div class="container">
+            <h2 class="section-title">✈️ Flight Booking</h2>
+            <p class="section-subtitle">Find the best flights for your journey</p>
+            
+            <div class="booking-card">
+                <form id="flightBookingForm" class="booking-form">
+                    <div class="trip-type">
+                        <label class="radio-label">
+                            <input type="radio" name="tripType" value="roundtrip" checked>
+                            <span>Round Trip</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="tripType" value="oneway">
+                            <span>One Way</span>
+                        </label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="flightFrom">From</label>
+                            <input type="text" id="flightFrom" name="from" placeholder="Departure city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="flightTo">To</label>
+                            <input type="text" id="flightTo" name="to" placeholder="Arrival city" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="flightDeparture">Departure Date</label>
+                            <input type="date" id="flightDeparture" name="departure" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="flightReturn">Return Date</label>
+                            <input type="date" id="flightReturn" name="return">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="flightPassengers">Passengers</label>
+                            <select id="flightPassengers" name="passengers" required>
+                                <option value="">Select passengers</option>
+                                <option value="1">1 Passenger</option>
+                                <option value="2">2 Passengers</option>
+                                <option value="3">3 Passengers</option>
+                                <option value="4">4 Passengers</option>
+                                <option value="5+">5+ Passengers</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="flightClass">Class</label>
+                            <select id="flightClass" name="class" required>
+                                <option value="">Select class</option>
+                                <option value="economy">Economy</option>
+                                <option value="business">Business</option>
+                                <option value="first">First Class</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="flightName">Passenger Name</label>
+                            <input type="text" id="flightName" name="name" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="flightEmail">Email</label>
+                            <input type="email" id="flightEmail" name="email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Search Flights</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About TravelGo</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <div class="icon">🌍</div>
+                    <h3>Global Coverage</h3>
+                    <p>Access thousands of hotels and flights worldwide</p>
+                </div>
+                <div class="about-card">
+                    <div class="icon">💰</div>
+                    <h3>Best Prices</h3>
+                    <p>Get the most competitive rates guaranteed</p>
+                </div>
+                <div class="about-card">
+                    <div class="icon">🔒</div>
+                    <h3>Secure Booking</h3>
+                    <p>Your information is safe and encrypted</p>
+                </div>
+                <div class="about-card">
+                    <div class="icon">⚡</div>
+                    <h3>Quick & Easy</h3>
+                    <p>Book in minutes with our simple interface</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <p class="section-subtitle">Have questions? We're here to help!</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="icon">📧</span>
+                    <span>support@travelgo.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">📞</span>
+                    <span>+1 (800) 123-4567</span>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">🕐</span>
+                    <span>24/7 Customer Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TravelGo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <div class="success-icon">✓</div>
+                <h2>Booking Confirmed!</h2>
+                <div id="bookingDetails"></div>
+                <button class="btn btn-primary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
