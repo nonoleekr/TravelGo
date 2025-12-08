@@ -8,26 +8,7 @@ function scrollToSection(sectionId) {
     }
 }
 
-// Update active navigation link on scroll
-window.addEventListener('scroll', () => {
-    const sections = document.querySelectorAll('section[id]');
-    const scrollPosition = window.scrollY + 100;
-
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        const sectionId = section.getAttribute('id');
-
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-            document.querySelectorAll('.nav-menu a').forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${sectionId}`) {
-                    link.classList.add('active');
-                }
-            });
-        }
-    });
-});
+// Update active navigation link on scroll (will be initialized after DOM loads)
 
 // Set minimum dates for date inputs
 function setMinDates() {
@@ -70,82 +51,9 @@ function setMinDates() {
     }
 }
 
-// Handle trip type change for flights (will be initialized after DOM loads)
+// Hotel Booking Form Submission (will be initialized after DOM loads)
 
-// Hotel Booking Form Submission
-const hotelBookingForm = document.getElementById('hotelBookingForm');
-
-if (hotelBookingForm) {
-    hotelBookingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(hotelBookingForm);
-        const bookingData = {};
-        
-        formData.forEach((value, key) => {
-            bookingData[key] = value;
-        });
-
-        // Validate check-out date is after check-in date
-        if (bookingData.checkIn && bookingData.checkOut) {
-            const checkIn = new Date(bookingData.checkIn);
-            const checkOut = new Date(bookingData.checkOut);
-            
-            if (checkOut <= checkIn) {
-                alert('Check-out date must be after check-in date');
-                return;
-            }
-
-            // Calculate number of nights
-            const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-            bookingData.nights = nights;
-        }
-
-        // Display confirmation
-        showBookingConfirmation('Hotel', bookingData);
-        
-        // Reset form
-        hotelBookingForm.reset();
-    });
-}
-
-// Flight Booking Form Submission
-const flightBookingForm = document.getElementById('flightBookingForm');
-
-if (flightBookingForm) {
-    flightBookingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(flightBookingForm);
-        const bookingData = {};
-        
-        formData.forEach((value, key) => {
-            bookingData[key] = value;
-        });
-
-        // Validate return date for round trips
-        if (bookingData.tripType === 'roundtrip') {
-            if (!bookingData.return) {
-                alert('Please select a return date for round trip');
-                return;
-            }
-
-            const departure = new Date(bookingData.departure);
-            const returnDate = new Date(bookingData.return);
-            
-            if (returnDate <= departure) {
-                alert('Return date must be after departure date');
-                return;
-            }
-        }
-
-        // Display confirmation
-        showBookingConfirmation('Flight', bookingData);
-        
-        // Reset form
-        flightBookingForm.reset();
-    });
-}
+// Flight Booking Form Submission (will be initialized after DOM loads)
 
 // Show Booking Confirmation Modal
 function showBookingConfirmation(type, data) {
@@ -196,19 +104,7 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-// Close modal when clicking X
-const closeBtn = document.querySelector('.close');
-if (closeBtn) {
-    closeBtn.addEventListener('click', closeModal);
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', (e) => {
-    const modal = document.getElementById('confirmationModal');
-    if (e.target === modal) {
-        closeModal();
-    }
-});
+// Modal event listeners (will be initialized after DOM loads)
 
 // Utility Functions
 function formatDate(dateString) {
@@ -261,6 +157,114 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+    
+    // Initialize Hotel Booking Form
+    const hotelBookingForm = document.getElementById('hotelBookingForm');
+    if (hotelBookingForm) {
+        hotelBookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(hotelBookingForm);
+            const bookingData = {};
+            
+            formData.forEach((value, key) => {
+                bookingData[key] = value;
+            });
+
+            // Validate check-out date is after check-in date
+            if (bookingData.checkIn && bookingData.checkOut) {
+                const checkIn = new Date(bookingData.checkIn);
+                const checkOut = new Date(bookingData.checkOut);
+                
+                if (checkOut <= checkIn) {
+                    alert('Check-out date must be after check-in date');
+                    return;
+                }
+
+                // Calculate number of nights
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                bookingData.nights = nights;
+            }
+
+            // Display confirmation
+            showBookingConfirmation('Hotel', bookingData);
+            
+            // Reset form
+            hotelBookingForm.reset();
+        });
+    }
+    
+    // Initialize Flight Booking Form
+    const flightBookingForm = document.getElementById('flightBookingForm');
+    if (flightBookingForm) {
+        flightBookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(flightBookingForm);
+            const bookingData = {};
+            
+            formData.forEach((value, key) => {
+                bookingData[key] = value;
+            });
+
+            // Validate return date for round trips
+            if (bookingData.tripType === 'roundtrip') {
+                if (!bookingData.return) {
+                    alert('Please select a return date for round trip');
+                    return;
+                }
+
+                const departure = new Date(bookingData.departure);
+                const returnDate = new Date(bookingData.return);
+                
+                if (returnDate <= departure) {
+                    alert('Return date must be after departure date');
+                    return;
+                }
+            }
+
+            // Display confirmation
+            showBookingConfirmation('Flight', bookingData);
+            
+            // Reset form
+            flightBookingForm.reset();
+        });
+    }
+    
+    // Initialize modal event listeners
+    const closeBtn = document.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('confirmationModal');
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // Update active navigation link on scroll
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('section[id]');
+        const scrollPosition = window.scrollY + 100;
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            const sectionId = section.getAttribute('id');
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                document.querySelectorAll('.nav-menu a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${sectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    });
     
     // Add smooth scrolling to all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
