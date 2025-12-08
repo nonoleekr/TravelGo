@@ -1,19 +1,4 @@
-// Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
-
-if (hamburger) {
-    hamburger.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-    });
-}
-
-// Close mobile menu when clicking a link
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
-    });
-});
+// Mobile Navigation Toggle (will be initialized after DOM loads)
 
 // Smooth Scrolling
 function scrollToSection(sectionId) {
@@ -85,22 +70,7 @@ function setMinDates() {
     }
 }
 
-// Handle trip type change for flights
-const tripTypeRadios = document.querySelectorAll('input[name="tripType"]');
-const flightReturn = document.getElementById('flightReturn');
-
-tripTypeRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        if (e.target.value === 'oneway') {
-            flightReturn.disabled = true;
-            flightReturn.required = false;
-            flightReturn.value = '';
-        } else {
-            flightReturn.disabled = false;
-            flightReturn.required = true;
-        }
-    });
-});
+// Handle trip type change for flights (will be initialized after DOM loads)
 
 // Hotel Booking Form Submission
 const hotelBookingForm = document.getElementById('hotelBookingForm');
@@ -254,6 +224,44 @@ function capitalizeFirst(string) {
 document.addEventListener('DOMContentLoaded', () => {
     setMinDates();
     
+    // Initialize mobile navigation
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+    
+    // Close mobile menu when clicking a link
+    if (navMenu) {
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+    
+    // Initialize trip type change handler for flights
+    const tripTypeRadios = document.querySelectorAll('input[name="tripType"]');
+    const flightReturn = document.getElementById('flightReturn');
+    
+    if (tripTypeRadios.length > 0 && flightReturn) {
+        tripTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'oneway') {
+                    flightReturn.disabled = true;
+                    flightReturn.required = false;
+                    flightReturn.value = '';
+                } else {
+                    flightReturn.disabled = false;
+                    flightReturn.required = true;
+                }
+            });
+        });
+    }
+    
     // Add smooth scrolling to all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -264,17 +272,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
-
-// Handle form validation styling
-document.querySelectorAll('input, select').forEach(input => {
-    input.addEventListener('invalid', (e) => {
-        e.target.style.borderColor = '#ef4444';
-    });
     
-    input.addEventListener('input', (e) => {
-        if (e.target.validity.valid) {
-            e.target.style.borderColor = '#e2e8f0';
-        }
+    // Handle form validation styling
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('invalid', (e) => {
+            e.target.style.borderColor = '#ef4444';
+        });
+        
+        input.addEventListener('input', (e) => {
+            if (e.target.validity.valid) {
+                e.target.style.borderColor = '#e2e8f0';
+            }
+        });
     });
 });
