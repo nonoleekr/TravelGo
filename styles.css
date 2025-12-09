@@ -314,14 +314,16 @@ header {
 
 /* Edit Button */
 .btn-edit {
-    background-color: var(--primary-color); /* Blue */
+    background-color: var(--primary-color);
+    /* Blue */
     color: white;
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
-    margin-right: 5px; /* Space between buttons */
+    margin-right: 5px;
+    /* Space between buttons */
     transition: background 0.2s;
 }
 

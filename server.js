@@ -24,6 +24,25 @@ mongoose.connect(dbURI)
 // ---------------------------------------------------------
 // 2. Mongoose Schema & Model [cite: 42, 102]
 // ---------------------------------------------------------
+const destinationSchema = new mongoose.Schema({
+    name: { type: String, required: true, unique: true }
+});
+
+const Destination = mongoose.model('Destination', destinationSchema);
+
+// ---------------------------------------------------------
+// Route: Get All Destinations
+// ---------------------------------------------------------
+app.get('/api/destinations', async (req, res) => {
+    try {
+        // Sort alphabetically
+        const destinations = await Destination.find().sort({ name: 1 });
+        res.json(destinations);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 const bookingSchema = new mongoose.Schema({
     travelerName: {
         type: String,

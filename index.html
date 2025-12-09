@@ -88,8 +88,9 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="hotelDestination">Destination</label>
-                            <input type="text" id="hotelDestination" name="destination"
-                                placeholder="Where are you going?" required>
+                            <select id="hotelDestination" name="destination" required>
+                                <option value="">Loading destinations...</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="hotelGuests">Number of Guests</label>
@@ -179,11 +180,15 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="flightFrom">From</label>
-                            <input type="text" id="flightFrom" name="from" placeholder="Departure city" required>
+                            <select id="flightFrom" name="from" required>
+                                <option value="">Loading destinations...</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="flightTo">To</label>
-                            <input type="text" id="flightTo" name="destination" placeholder="Arrival city" required>
+                            <select id="flightTo" name="destination" required>
+                                <option value="">Loading destinations...</option>
+                            </select>
                         </div>
                     </div>
 
