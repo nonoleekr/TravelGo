@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <title>TravelGo - Book Hotels & Flights</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- Navigation Header -->
     <header>
@@ -48,13 +50,14 @@
         <div class="container">
             <h2 class="section-title">🏨 Hotel Booking</h2>
             <p class="section-subtitle">Find and book your perfect stay</p>
-            
+
             <div class="booking-card">
                 <form id="hotelBookingForm" class="booking-form">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="hotelDestination">Destination</label>
-                            <input type="text" id="hotelDestination" name="destination" placeholder="Where are you going?" required>
+                            <input type="text" id="hotelDestination" name="destination"
+                                placeholder="Where are you going?" required>
                         </div>
                         <div class="form-group">
                             <label for="hotelGuests">Number of Guests</label>
@@ -93,18 +96,26 @@
                         </div>
                         <div class="form-group">
                             <label for="hotelName">Your Name</label>
-                            <input type="text" id="hotelName" name="name" placeholder="Full Name" required>
+                            <input type="text" id="hotelName" name="travelerName" placeholder="Full Name" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="hotelEmail">Email</label>
-                            <input type="email" id="hotelEmail" name="email" placeholder="your@email.com" required>
+                            <label for="hotelPassport">Passport Number</label>
+                            <input type="text" id="hotelPassport" name="passportNum" placeholder="e.g. A12345678"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="hotelPhone">Phone Number</label>
                             <input type="tel" id="hotelPhone" name="phone" placeholder="+1 234 567 8900" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="width: 100%">
+                            <label for="hotelEmail">Email</label>
+                            <input type="email" id="hotelEmail" name="email" placeholder="your@email.com" required>
                         </div>
                     </div>
 
@@ -119,7 +130,7 @@
         <div class="container">
             <h2 class="section-title">✈️ Flight Booking</h2>
             <p class="section-subtitle">Find the best flights for your journey</p>
-            
+
             <div class="booking-card">
                 <form id="flightBookingForm" class="booking-form">
                     <div class="trip-type">
@@ -140,14 +151,14 @@
                         </div>
                         <div class="form-group">
                             <label for="flightTo">To</label>
-                            <input type="text" id="flightTo" name="to" placeholder="Arrival city" required>
+                            <input type="text" id="flightTo" name="destination" placeholder="Arrival city" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="flightDeparture">Departure Date</label>
-                            <input type="date" id="flightDeparture" name="departure" required>
+                            <input type="date" id="flightDeparture" name="flightDate" required>
                         </div>
                         <div class="form-group">
                             <label for="flightReturn">Return Date</label>
@@ -181,9 +192,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="flightName">Passenger Name</label>
-                            <input type="text" id="flightName" name="name" placeholder="Full Name" required>
+                            <input type="text" id="flightName" name="travelerName" placeholder="Full Name" required>
                         </div>
                         <div class="form-group">
+                            <label for="flightPassport">Passport Number</label>
+                            <input type="text" id="flightPassport" name="passportNum" placeholder="e.g. A12345678"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="width: 100%">
                             <label for="flightEmail">Email</label>
                             <input type="email" id="flightEmail" name="email" placeholder="your@email.com" required>
                         </div>
@@ -268,4 +287,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

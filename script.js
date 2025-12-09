@@ -13,11 +13,11 @@ function scrollToSection(sectionId) {
 // Set minimum dates for date inputs
 function setMinDates() {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // Hotel dates
     const hotelCheckIn = document.getElementById('hotelCheckIn');
     const hotelCheckOut = document.getElementById('hotelCheckOut');
-    
+
     if (hotelCheckIn) {
         hotelCheckIn.min = today;
         hotelCheckIn.addEventListener('change', () => {
@@ -35,7 +35,7 @@ function setMinDates() {
     // Flight dates
     const flightDeparture = document.getElementById('flightDeparture');
     const flightReturn = document.getElementById('flightReturn');
-    
+
     if (flightDeparture) {
         flightDeparture.min = today;
         flightDeparture.addEventListener('change', () => {
@@ -59,9 +59,9 @@ function setMinDates() {
 function showBookingConfirmation(type, data) {
     const modal = document.getElementById('confirmationModal');
     const bookingDetails = document.getElementById('bookingDetails');
-    
+
     let detailsHTML = `<h3>${type} Booking Details:</h3>`;
-    
+
     if (type === 'Hotel') {
         detailsHTML += `
             <p><strong>Destination:</strong> ${data.destination}</p>
@@ -93,7 +93,7 @@ function showBookingConfirmation(type, data) {
             </p>
         `;
     }
-    
+
     bookingDetails.innerHTML = detailsHTML;
     modal.style.display = 'block';
 }
@@ -119,17 +119,17 @@ function capitalizeFirst(string) {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setMinDates();
-    
+
     // Initialize mobile navigation
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
-    
+
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
             navMenu.classList.toggle('active');
         });
     }
-    
+
     // Close mobile menu when clicking a link
     if (navMenu) {
         document.querySelectorAll('.nav-menu a').forEach(link => {
@@ -138,11 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     // Initialize trip type change handler for flights
     const tripTypeRadios = document.querySelectorAll('input[name="tripType"]');
     const flightReturn = document.getElementById('flightReturn');
-    
+
     if (tripTypeRadios.length > 0 && flightReturn) {
         tripTypeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -157,16 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     // Initialize Hotel Booking Form
     const hotelBookingForm = document.getElementById('hotelBookingForm');
     if (hotelBookingForm) {
         hotelBookingForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(hotelBookingForm);
             const bookingData = {};
-            
+
             formData.forEach((value, key) => {
                 bookingData[key] = value;
             });
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bookingData.checkIn && bookingData.checkOut) {
                 const checkIn = new Date(bookingData.checkIn);
                 const checkOut = new Date(bookingData.checkOut);
-                
+
                 if (checkOut <= checkIn) {
                     alert('Check-out date must be after check-in date');
                     return;
@@ -188,21 +188,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display confirmation
             showBookingConfirmation('Hotel', bookingData);
-            
+
             // Reset form
             hotelBookingForm.reset();
         });
     }
-    
+
     // Initialize Flight Booking Form
     const flightBookingForm = document.getElementById('flightBookingForm');
     if (flightBookingForm) {
         flightBookingForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(flightBookingForm);
             const bookingData = {};
-            
+
             formData.forEach((value, key) => {
                 bookingData[key] = value;
             });
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const departure = new Date(bookingData.departure);
                 const returnDate = new Date(bookingData.return);
-                
+
                 if (returnDate <= departure) {
                     alert('Return date must be after departure date');
                     return;
@@ -225,18 +225,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display confirmation
             showBookingConfirmation('Flight', bookingData);
-            
+
             // Reset form
             flightBookingForm.reset();
         });
     }
-    
+
     // Initialize modal event listeners
     const closeBtn = document.querySelector('.close');
     if (closeBtn) {
         closeBtn.addEventListener('click', closeModal);
     }
-    
+
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         const modal = document.getElementById('confirmationModal');
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
-    
+
     // Update active navigation link on scroll
     window.addEventListener('scroll', () => {
         const sections = document.querySelectorAll('section[id]');
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
+
     // Add smooth scrolling to all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -276,13 +276,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
+
     // Handle form validation styling
     document.querySelectorAll('input, select').forEach(input => {
         input.addEventListener('invalid', (e) => {
             e.target.style.borderColor = '#ef4444';
         });
-        
+
         input.addEventListener('input', (e) => {
             if (e.target.validity.valid) {
                 e.target.style.borderColor = '#e2e8f0';
