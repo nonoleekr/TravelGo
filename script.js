@@ -387,3 +387,11 @@ async function handleEditSubmit(e) {
         alert('Error connecting to server');
     }
 }
+
+// CLOSE Confirmation Modal
+window.closeModal = function() {
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
