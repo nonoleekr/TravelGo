@@ -250,6 +250,101 @@ header {
     cursor: pointer;
 }
 
+/* Dashboard Table Styles */
+.dashboard-container {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    overflow-x: auto;
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    /* Ensures table doesn't squish too much on mobile */
+}
+
+.dashboard-table th,
+.dashboard-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dashboard-table th {
+    background-color: var(--light-color);
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Alternating row colors [Report Requirement] */
+.dashboard-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.dashboard-table tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-confirmed {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+.status-cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Edit Button */
+.btn-edit {
+    background-color: var(--primary-color); /* Blue */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-right: 5px; /* Space between buttons */
+    transition: background 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #1d4ed8;
+}
+
+/* Delete Button */
+.btn-delete {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+}
+
 /* About Section */
 .about-section {
     padding: 80px 20px;
@@ -338,7 +433,7 @@ footer {
 
 .modal-content {
     background-color: var(--white);
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 0;
     border-radius: 12px;
     max-width: 500px;

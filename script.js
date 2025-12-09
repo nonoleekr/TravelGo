@@ -1,6 +1,47 @@
-// Mobile Navigation Toggle (will be initialized after DOM loads)
+// Global Configuration
+const API_URL = 'http://localhost:3000/api/bookings';
 
-// Smooth Scrolling
+// ==========================================
+// 1. UI Interactions (Navigation & Scroll)
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize standard UI features
+    initializeNavigation();
+    setMinDates();
+    initializeForms();
+    initializeModal();
+});
+
+function initializeNavigation() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+}
+
 function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -8,9 +49,10 @@ function scrollToSection(sectionId) {
     }
 }
 
-// Update active navigation link on scroll (will be initialized after DOM loads)
+// ==========================================
+// 2. Date Validations
+// ==========================================
 
-// Set minimum dates for date inputs
 function setMinDates() {
     const today = new Date().toISOString().split('T')[0];
 
@@ -21,15 +63,10 @@ function setMinDates() {
     if (hotelCheckIn) {
         hotelCheckIn.min = today;
         hotelCheckIn.addEventListener('change', () => {
-            hotelCheckOut.min = hotelCheckIn.value;
-            if (hotelCheckOut.value && hotelCheckOut.value < hotelCheckIn.value) {
-                hotelCheckOut.value = '';
+            if (hotelCheckOut) {
+                hotelCheckOut.min = hotelCheckIn.value;
             }
         });
-    }
-
-    if (hotelCheckOut) {
-        hotelCheckOut.min = today;
     }
 
     // Flight dates
@@ -39,254 +76,333 @@ function setMinDates() {
     if (flightDeparture) {
         flightDeparture.min = today;
         flightDeparture.addEventListener('change', () => {
-            flightReturn.min = flightDeparture.value;
-            if (flightReturn.value && flightReturn.value < flightDeparture.value) {
-                flightReturn.value = '';
+            if (flightReturn) {
+                flightReturn.min = flightDeparture.value;
             }
         });
     }
 
-    if (flightReturn) {
-        flightReturn.min = today;
-    }
-}
-
-// Hotel Booking Form Submission (will be initialized after DOM loads)
-
-// Flight Booking Form Submission (will be initialized after DOM loads)
-
-// Show Booking Confirmation Modal
-function showBookingConfirmation(type, data) {
-    const modal = document.getElementById('confirmationModal');
-    const bookingDetails = document.getElementById('bookingDetails');
-
-    let detailsHTML = `<h3>${type} Booking Details:</h3>`;
-
-    if (type === 'Hotel') {
-        detailsHTML += `
-            <p><strong>Destination:</strong> ${data.destination}</p>
-            <p><strong>Guest Name:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
-            <p><strong>Check-in:</strong> ${formatDate(data.checkIn)}</p>
-            <p><strong>Check-out:</strong> ${formatDate(data.checkOut)}</p>
-            <p><strong>Nights:</strong> ${data.nights}</p>
-            <p><strong>Guests:</strong> ${data.guests}</p>
-            <p><strong>Room Type:</strong> ${capitalizeFirst(data.roomType)}</p>
-            <p style="margin-top: 1rem; color: #10b981; font-weight: bold;">
-                Confirmation sent to ${data.email}
-            </p>
-        `;
-    } else if (type === 'Flight') {
-        detailsHTML += `
-            <p><strong>From:</strong> ${data.from}</p>
-            <p><strong>To:</strong> ${data.to}</p>
-            <p><strong>Passenger Name:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Trip Type:</strong> ${capitalizeFirst(data.tripType)}</p>
-            <p><strong>Departure:</strong> ${formatDate(data.departure)}</p>
-            ${data.return ? `<p><strong>Return:</strong> ${formatDate(data.return)}</p>` : ''}
-            <p><strong>Passengers:</strong> ${data.passengers}</p>
-            <p><strong>Class:</strong> ${capitalizeFirst(data.class)}</p>
-            <p style="margin-top: 1rem; color: #10b981; font-weight: bold;">
-                Confirmation sent to ${data.email}
-            </p>
-        `;
-    }
-
-    bookingDetails.innerHTML = detailsHTML;
-    modal.style.display = 'block';
-}
-
-// Close Modal
-function closeModal() {
-    const modal = document.getElementById('confirmationModal');
-    modal.style.display = 'none';
-}
-
-// Modal event listeners (will be initialized after DOM loads)
-
-// Utility Functions
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-}
-
-function capitalizeFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    setMinDates();
-
-    // Initialize mobile navigation
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-    }
-
-    // Close mobile menu when clicking a link
-    if (navMenu) {
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-            });
-        });
-    }
-
-    // Initialize trip type change handler for flights
+    // Trip Type Toggler
     const tripTypeRadios = document.querySelectorAll('input[name="tripType"]');
-    const flightReturn = document.getElementById('flightReturn');
-
     if (tripTypeRadios.length > 0 && flightReturn) {
         tripTypeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 if (e.target.value === 'oneway') {
                     flightReturn.disabled = true;
-                    flightReturn.required = false;
                     flightReturn.value = '';
                 } else {
                     flightReturn.disabled = false;
-                    flightReturn.required = true;
                 }
             });
         });
     }
+}
 
-    // Initialize Hotel Booking Form
-    const hotelBookingForm = document.getElementById('hotelBookingForm');
-    if (hotelBookingForm) {
-        hotelBookingForm.addEventListener('submit', (e) => {
+// ==========================================
+// 3. Backend Integration (The "Integration Specialist" Work)
+// ==========================================
+
+function initializeForms() {
+    // Hotel Form Handler
+    const hotelForm = document.getElementById('hotelBookingForm');
+    if (hotelForm) {
+        hotelForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(hotelBookingForm);
-            const bookingData = {};
+            // Gather raw data
+            const formData = new FormData(hotelForm);
+            const data = Object.fromEntries(formData.entries());
 
-            formData.forEach((value, key) => {
-                bookingData[key] = value;
-            });
+            // 1. Calculate Price (Dummy logic: $100 per night)
+            const nights = calculateDays(data.checkIn, data.checkOut) || 1;
+            const estimatedPrice = nights * 100 * (parseInt(data.guests) || 1);
 
-            // Validate check-out date is after check-in date
-            if (bookingData.checkIn && bookingData.checkOut) {
-                const checkIn = new Date(bookingData.checkIn);
-                const checkOut = new Date(bookingData.checkOut);
+            // 2. Map to Database Schema
+            const bookingPayload = {
+                travelerName: data.travelerName,
+                passportNum: data.passportNum,
+                destination: data.destination,
+                flightDate: data.checkIn, // Use check-in as the primary date
+                hotelName: `Hotel in ${data.destination} (${data.roomType})`,
+                status: 'Confirmed',
+                price: estimatedPrice
+            };
 
-                if (checkOut <= checkIn) {
-                    alert('Check-out date must be after check-in date');
-                    return;
-                }
-
-                // Calculate number of nights
-                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-                bookingData.nights = nights;
-            }
-
-            // Display confirmation
-            showBookingConfirmation('Hotel', bookingData);
-
-            // Reset form
-            hotelBookingForm.reset();
+            // 3. Send to Server
+            await sendBookingData(bookingPayload, 'Hotel');
+            hotelForm.reset();
         });
     }
 
-    // Initialize Flight Booking Form
-    const flightBookingForm = document.getElementById('flightBookingForm');
-    if (flightBookingForm) {
-        flightBookingForm.addEventListener('submit', (e) => {
+    // Flight Form Handler
+    const flightForm = document.getElementById('flightBookingForm');
+    if (flightForm) {
+        flightForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(flightBookingForm);
-            const bookingData = {};
+            const formData = new FormData(flightForm);
+            const data = Object.fromEntries(formData.entries());
 
-            formData.forEach((value, key) => {
-                bookingData[key] = value;
-            });
+            // 1. Calculate Price (Dummy logic: $300 per passenger)
+            const passengers = parseInt(data.passengers) || 1;
+            const estimatedPrice = passengers * 300 + (data.class === 'business' ? 500 : 0);
 
-            // Validate return date for round trips
-            if (bookingData.tripType === 'roundtrip') {
-                if (!bookingData.return) {
-                    alert('Please select a return date for round trip');
-                    return;
-                }
+            // 2. Map to Database Schema
+            const bookingPayload = {
+                travelerName: data.travelerName,
+                passportNum: data.passportNum,
+                destination: data.destination, // Mapped from 'to' field in HTML
+                flightDate: data.flightDate,   // Mapped from 'departure' field
+                hotelName: 'N/A',             // No hotel for flight-only bookings
+                status: 'Confirmed',
+                price: estimatedPrice
+            };
 
-                const departure = new Date(bookingData.departure);
-                const returnDate = new Date(bookingData.return);
-
-                if (returnDate <= departure) {
-                    alert('Return date must be after departure date');
-                    return;
-                }
-            }
-
-            // Display confirmation
-            showBookingConfirmation('Flight', bookingData);
-
-            // Reset form
-            flightBookingForm.reset();
+            // 3. Send to Server
+            await sendBookingData(bookingPayload, 'Flight');
+            flightForm.reset();
         });
     }
+}
 
-    // Initialize modal event listeners
+// Generic function to send data to backend
+async function sendBookingData(payload, type) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Booking failed');
+        }
+
+        // Success!
+        showBookingConfirmation(type, payload);
+
+    } catch (error) {
+        alert('Error: ' + error.message);
+        console.error('Booking Error:', error);
+    }
+}
+
+// Helper to calculate date difference
+function calculateDays(start, end) {
+    const d1 = new Date(start);
+    const d2 = new Date(end);
+    const diff = d2.getTime() - d1.getTime();
+    return Math.ceil(diff / (1000 * 3600 * 24));
+}
+
+// ==========================================
+// 4. Modal Interactions
+// ==========================================
+
+function showBookingConfirmation(type, data) {
+    const modal = document.getElementById('confirmationModal');
+    const bookingDetails = document.getElementById('bookingDetails');
+
+    bookingDetails.innerHTML = `
+        <h3>${type} Booking Successful!</h3>
+        <p><strong>Name:</strong> ${data.travelerName}</p>
+        <p><strong>Passport:</strong> ${data.passportNum}</p>
+        <p><strong>Destination:</strong> ${data.destination}</p>
+        <p><strong>Date:</strong> ${data.flightDate}</p>
+        <p><strong>Total Price:</strong> $${data.price}</p>
+        <p class="success-msg">Saved to MongoDB successfully!</p>
+    `;
+
+    modal.style.display = 'block';
+}
+
+function initializeModal() {
+    const modal = document.getElementById('confirmationModal');
     const closeBtn = document.querySelector('.close');
+
+    // Close function
+    window.closeModal = function () {
+        modal.style.display = 'none';
+    };
+
     if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', window.closeModal);
     }
 
-    // Close modal when clicking outside
     window.addEventListener('click', (e) => {
-        const modal = document.getElementById('confirmationModal');
         if (e.target === modal) {
-            closeModal();
+            window.closeModal();
         }
     });
+}
 
-    // Update active navigation link on scroll
-    window.addEventListener('scroll', () => {
-        const sections = document.querySelectorAll('section[id]');
-        const scrollPosition = window.scrollY + 100;
+// ==========================================
+// 5. Dashboard Logic (Read & Delete)
+// ==========================================
 
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
+// Load bookings when page loads
+document.addEventListener('DOMContentLoaded', fetchBookings);
 
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                document.querySelectorAll('.nav-menu a').forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-        });
+// READ: Fetch all bookings from server
+async function fetchBookings() {
+    try {
+        const response = await fetch(API_URL);
+        const bookings = await response.json();
+        renderTable(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+    }
+}
+
+// Render the table rows
+function renderTable(bookings) {
+    const tableBody = document.getElementById('bookingTableBody');
+    const noMsg = document.getElementById('noBookingsMsg');
+
+    tableBody.innerHTML = ''; // Clear current list
+
+    if (bookings.length === 0) {
+        noMsg.style.display = 'block';
+        return;
+    }
+
+    noMsg.style.display = 'none';
+
+    bookings.forEach(booking => {
+        const row = document.createElement('tr');
+
+        // Format Date
+        const dateStr = new Date(booking.flightDate).toLocaleDateString();
+
+        // Determine Status Badge Class
+        const statusClass = `status-${booking.status.toLowerCase()}`;
+
+        row.innerHTML = `
+            <td>${booking.travelerName}</td>
+            <td>${booking.passportNum}</td>
+            <td>${booking.destination}</td>
+            <td>${dateStr}</td>
+            <td><span class="status-badge ${statusClass}">${booking.status}</span></td>
+            <td>$${booking.price}</td>
+            <td>
+                <button class="btn-edit" onclick='openEditModal(${JSON.stringify(booking)})'>Edit</button>
+                <button class="btn-delete" onclick="deleteBooking('${booking._id}')">Delete</button>
+            </td>
+        `;
+
+        tableBody.appendChild(row);
     });
+}
 
-    // Add smooth scrolling to all anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+// DELETE: Remove a booking
+async function deleteBooking(id) {
+    // Safety Check [Report Requirement: "Preventing accidental deletions"]
+    if (!confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Booking deleted successfully');
+            fetchBookings(); // Refresh the table
+        } else {
+            alert('Failed to delete booking');
+        }
+    } catch (error) {
+        console.error('Error deleting:', error);
+        alert('Error connecting to server');
+    }
+}
+
+// Make deleteBooking available globally (since it's called from HTML string)
+window.deleteBooking = deleteBooking;
+
+// Hook into the form submissions to auto-refresh the table after a new booking
+const originalShowConfirmation = showBookingConfirmation;
+showBookingConfirmation = function (type, data) {
+    originalShowConfirmation(type, data); // Call the original modal
+    fetchBookings(); // Refresh dashboard data immediately
+};
+
+// ==========================================
+// 6. Edit / Update Logic
+// ==========================================
+
+const editModal = document.getElementById('editModal');
+const editForm = document.getElementById('editBookingForm');
+
+// 1. OPEN MODAL: Fill form with existing data
+window.openEditModal = function (booking) {
+    // Fill the hidden ID field so we know which booking to update
+    document.getElementById('editId').value = booking._id;
+
+    // Fill visible fields
+    document.getElementById('editName').value = booking.travelerName;
+    document.getElementById('editDestination').value = booking.destination;
+    document.getElementById('editStatus').value = booking.status;
+
+    // Format Date for Input (YYYY-MM-DD)
+    const dateObj = new Date(booking.flightDate);
+    const dateStr = dateObj.toISOString().split('T')[0];
+    document.getElementById('editDate').value = dateStr;
+
+    // Show Modal
+    editModal.style.display = 'block';
+};
+
+// 2. CLOSE MODAL
+window.closeEditModal = function () {
+    editModal.style.display = 'none';
+};
+
+// 3. SUBMIT UPDATE (PUT Request)
+if (editForm) {
+    editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('editId').value;
+        const updatedData = {
+            travelerName: document.getElementById('editName').value,
+            destination: document.getElementById('editDestination').value,
+            flightDate: document.getElementById('editDate').value,
+            status: document.getElementById('editStatus').value
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                alert('Booking updated successfully!');
+                closeEditModal();
+                fetchBookings(); // Refresh the dashboard table
+            } else {
+                const err = await response.json();
+                alert('Update failed: ' + err.message);
             }
-        });
+        } catch (error) {
+            console.error('Error updating:', error);
+            alert('Error connecting to server');
+        }
     });
+}
 
-    // Handle form validation styling
-    document.querySelectorAll('input, select').forEach(input => {
-        input.addEventListener('invalid', (e) => {
-            e.target.style.borderColor = '#ef4444';
-        });
-
-        input.addEventListener('input', (e) => {
-            if (e.target.validity.valid) {
-                e.target.style.borderColor = '#e2e8f0';
-            }
-        });
-    });
+// Close edit modal when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+        closeEditModal();
+    }
 });

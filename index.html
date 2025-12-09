@@ -21,6 +21,7 @@
                     <li><a href="#home" class="active">Home</a></li>
                     <li><a href="#hotels">Hotels</a></li>
                     <li><a href="#flights">Flights</a></li>
+                    <li><a href="#dashboard">Bookings</a></li>
                     <li><a href="#about">About</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
@@ -41,6 +42,37 @@
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="scrollToSection('hotels')">Book Hotels</button>
                 <button class="btn btn-secondary" onclick="scrollToSection('flights')">Book Flights</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="booking-section">
+        <div class="container">
+            <h2 class="section-title">📊 My Bookings</h2>
+            <p class="section-subtitle">Manage your current travel plans</p>
+
+            <div class="dashboard-container">
+                <div class="table-responsive">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Traveler</th>
+                                <th>Passport</th>
+                                <th>Destination</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noBookingsMsg" style="text-align: center; display: none; margin-top: 20px;">
+                    <p>No bookings found. Start by searching for a hotel or flight!</p>
+                </div>
             </div>
         </div>
     </section>
@@ -284,7 +316,44 @@
             </div>
         </div>
     </div>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <div class="modal-body">
+                <h2>Edit Booking</h2>
+                <form id="editBookingForm" class="booking-form">
+                    <input type="hidden" id="editId">
 
+                    <div class="form-group">
+                        <label for="editName">Traveler Name</label>
+                        <input type="text" id="editName" name="travelerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDestination">Destination</label>
+                        <input type="text" id="editDestination" name="destination" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDate">Flight Date</label>
+                        <input type="date" id="editDate" name="flightDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStatus">Status</label>
+                        <select id="editStatus" name="status">
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 20px;">Save
+                        Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 
