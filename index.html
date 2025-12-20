@@ -25,6 +25,14 @@
                     <li><a href="#about">About</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" onclick="openLoginModal()">Login</button>
+                    <button class="btn btn-primary" onclick="openRegisterModal()">Sign Up</button>
+                </div>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn btn-outline" onclick="logout()">Logout</button>
+                </div>
                 <div class="hamburger">
                     <span></span>
                     <span></span>
@@ -321,6 +329,72 @@
             </div>
         </div>
     </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content auth-modal">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <div class="modal-body">
+                <h2>Welcome Back!</h2>
+                <p class="auth-subtitle">Login to manage your bookings</p>
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+
+                    <div id="loginError" class="error-message" style="display: none;"></div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </form>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="switchToRegister(event)">Sign up here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content auth-modal">
+            <span class="close" onclick="closeRegisterModal()">&times;</span>
+            <div class="modal-body">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Join TravelGo and start your journey</p>
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" name="username" required minlength="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" name="password" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" name="confirmPassword" required minlength="6">
+                    </div>
+
+                    <div id="registerError" class="error-message" style="display: none;"></div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" onclick="switchToLogin(event)">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Booking Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>

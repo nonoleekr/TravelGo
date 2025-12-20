@@ -3,6 +3,7 @@
 // ==========================================
 const API_URL = 'http://localhost:3000/api/bookings';
 const DEST_API_URL = 'http://localhost:3000/api/destinations';
+const AUTH_API_URL = 'http://localhost:3000/api/auth';
 
 // ==========================================
 // 2. Initialization (Main Entry Point)
@@ -11,12 +12,229 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeForms();
     initializeModals();
+    initializeAuth();
 
     // Data Loading
     fetchBookings();
     fetchDestinations();
     setMinDates();
 });
+
+// ==========================================
+// 2.1 Authentication Functions
+// ==========================================
+
+// Initialize authentication state
+function initializeAuth() {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        updateUIForLoggedInUser(user);
+    }
+
+    // Setup auth form handlers
+    setupAuthForms();
+}
+
+// Setup authentication form handlers
+function setupAuthForms() {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+    }
+}
+
+// Handle login form submission
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
+
+    try {
+        const response = await fetch(`${AUTH_API_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Store token and user info
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Update UI
+            updateUIForLoggedInUser(data.user);
+            closeLoginModal();
+            
+            // Clear form
+            e.target.reset();
+            errorDiv.style.display = 'none';
+            
+            // Refresh bookings for this user
+            fetchBookings();
+            
+            // Show success message
+            showNotification('Login successful! Welcome back, ' + data.user.username);
+        } else {
+            errorDiv.textContent = data.message || 'Login failed';
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.style.display = 'block';
+    }
+}
+
+// Handle register form submission
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('registerUsername').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const errorDiv = document.getElementById('registerError');
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'Passwords do not match';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${AUTH_API_URL}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Store token and user info
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Update UI
+            updateUIForLoggedInUser(data.user);
+            closeRegisterModal();
+            
+            // Clear form
+            e.target.reset();
+            errorDiv.style.display = 'none';
+            
+            // Refresh bookings for this new user
+            fetchBookings();
+            
+            // Show success message
+            showNotification('Account created successfully! Welcome, ' + data.user.username);
+        } else {
+            errorDiv.textContent = data.message || 'Registration failed';
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.style.display = 'block';
+    }
+}
+
+// Update UI for logged-in user
+function updateUIForLoggedInUser(user) {
+    const authButtons = document.getElementById('authButtons');
+    const userInfo = document.getElementById('userInfo');
+    const userName = document.getElementById('userName');
+
+    if (authButtons && userInfo && userName) {
+        authButtons.style.display = 'none';
+        userInfo.style.display = 'flex';
+        userName.textContent = '👤 ' + user.username;
+    }
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    const authButtons = document.getElementById('authButtons');
+    const userInfo = document.getElementById('userInfo');
+
+    if (authButtons && userInfo) {
+        authButtons.style.display = 'flex';
+        userInfo.style.display = 'none';
+    }
+    
+    // Clear bookings from view without needing a full page refresh
+    renderTable([]);
+    
+    showNotification('Logged out successfully');
+}
+
+// Modal control functions
+function openLoginModal() {
+    document.getElementById('loginModal').style.display = 'block';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function openRegisterModal() {
+    document.getElementById('registerModal').style.display = 'block';
+}
+
+function closeRegisterModal() {
+    document.getElementById('registerModal').style.display = 'none';
+    document.getElementById('registerError').style.display = 'none';
+}
+
+function switchToRegister(e) {
+    e.preventDefault();
+    closeLoginModal();
+    openRegisterModal();
+}
+
+function switchToLogin(e) {
+    e.preventDefault();
+    closeRegisterModal();
+    openLoginModal();
+}
+
+// Show notification
+function showNotification(message) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Hide and remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 
 // ==========================================
 // 3. Navigation & UI Logic
@@ -116,6 +334,15 @@ function calculateDays(start, end) {
 // 5. Backend Integration: Fetch Data
 // ==========================================
 
+// Helper function to get authorization headers
+function getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+    };
+}
+
 // Fetch Destinations for Dropdowns
 async function fetchDestinations() {
     try {
@@ -140,12 +367,30 @@ async function fetchDestinations() {
 
 // Fetch All Bookings (Read)
 async function fetchBookings() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        // User not logged in, show empty table
+        renderTable([]);
+        return;
+    }
+
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            headers: getAuthHeaders()
+        });
+        
+        if (response.status === 401 || response.status === 403) {
+            // Token expired or invalid
+            logout();
+            renderTable([]);
+            return;
+        }
+        
         const bookings = await response.json();
         renderTable(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
+        renderTable([]);
     }
 }
 
@@ -246,16 +491,31 @@ function initializeForms() {
 }
 
 async function sendBookingData(payload, type) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Please login to create bookings');
+        openLoginModal();
+        return;
+    }
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload)
         });
 
         const result = await response.json();
 
-        if (!response.ok) throw new Error(result.message || 'Booking failed');
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                alert('Session expired. Please login again.');
+                logout();
+                openLoginModal();
+                return;
+            }
+            throw new Error(result.message || 'Booking failed');
+        }
 
         showBookingConfirmation(type, payload);
         fetchBookings(); // Refresh Dashboard immediately
@@ -321,8 +581,25 @@ window.deleteBooking = async function (id) {
         return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Please login to delete bookings');
+        openLoginModal();
+        return;
+    }
+
     try {
-        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${API_URL}/${id}`, { 
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            alert('Session expired. Please login again.');
+            logout();
+            openLoginModal();
+            return;
+        }
 
         if (response.ok) {
             alert('Booking deleted successfully');
@@ -360,6 +637,14 @@ async function handleEditSubmit(e) {
     const id = document.getElementById('editId').value;
     const editModal = document.getElementById('editModal');
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Please login to update bookings');
+        editModal.style.display = 'none';
+        openLoginModal();
+        return;
+    }
+
     const updatedData = {
         travelerName: document.getElementById('editName').value,
         destination: document.getElementById('editDestination').value,
@@ -370,9 +655,17 @@ async function handleEditSubmit(e) {
     try {
         const response = await fetch(`${API_URL}/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify(updatedData)
         });
+
+        if (response.status === 401 || response.status === 403) {
+            alert('Session expired. Please login again.');
+            editModal.style.display = 'none';
+            logout();
+            openLoginModal();
+            return;
+        }
 
         if (response.ok) {
             alert('Booking updated successfully!');
