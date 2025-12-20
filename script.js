@@ -30,6 +30,8 @@ function initializeAuth() {
     if (token) {
         const user = JSON.parse(localStorage.getItem('user'));
         updateUIForLoggedInUser(user);
+        // Auto-fill booking forms with saved user data
+        autoFillBookingForms();
     }
 
     // Setup auth form handlers
@@ -40,6 +42,7 @@ function initializeAuth() {
 function setupAuthForms() {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const profileForm = document.getElementById('profileForm');
 
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
@@ -47,6 +50,10 @@ function setupAuthForms() {
 
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
+    }
+
+    if (profileForm) {
+        profileForm.addEventListener('submit', handleProfileUpdate);
     }
 }
 
@@ -84,6 +91,9 @@ async function handleLogin(e) {
             
             // Refresh bookings for this user
             fetchBookings();
+            
+            // Auto-fill booking forms with user data
+            autoFillBookingForms();
             
             // Show success message
             showNotification('Login successful! Welcome back, ' + data.user.username);
@@ -142,6 +152,9 @@ async function handleRegister(e) {
             // Refresh bookings for this new user
             fetchBookings();
             
+            // Auto-fill booking forms with user data
+            autoFillBookingForms();
+            
             // Show success message
             showNotification('Account created successfully! Welcome, ' + data.user.username);
         } else {
@@ -168,6 +181,90 @@ function updateUIForLoggedInUser(user) {
     }
 }
 
+// Handle profile update form submission
+async function handleProfileUpdate(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('profileUsername').value;
+    const email = document.getElementById('profileEmail').value;
+    const fullName = document.getElementById('profileFullName').value;
+    const phone = document.getElementById('profilePhone').value;
+    const passportNum = document.getElementById('profilePassport').value;
+    const currentPassword = document.getElementById('profileCurrentPassword').value;
+    const newPassword = document.getElementById('profileNewPassword').value;
+    const confirmPassword = document.getElementById('profileConfirmPassword').value;
+    const errorDiv = document.getElementById('profileError');
+
+    // Validate password fields if any are filled
+    if (currentPassword || newPassword || confirmPassword) {
+        if (!currentPassword) {
+            errorDiv.textContent = 'Current password is required to change password';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (!newPassword) {
+            errorDiv.textContent = 'New password is required';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            errorDiv.textContent = 'New passwords do not match';
+            errorDiv.style.display = 'block';
+            return;
+        }
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        closeProfileModal();
+        openLoginModal();
+        return;
+    }
+
+    try {
+        const updateData = { username, email, fullName, phone, passportNum };
+        if (currentPassword && newPassword) {
+            updateData.currentPassword = currentPassword;
+            updateData.newPassword = newPassword;
+        }
+
+        const response = await fetch(`${AUTH_API_URL}/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Update stored user info
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Update UI
+            updateUIForLoggedInUser(data.user);
+            closeProfileModal();
+            
+            errorDiv.style.display = 'none';
+            
+            // Auto-fill forms with new data
+            autoFillBookingForms();
+            
+            // Show success message
+            showNotification('Profile updated successfully!');
+        } else {
+            errorDiv.textContent = data.message || 'Update failed';
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Profile update error:', error);
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.style.display = 'block';
+    }
+}
+
 // Logout function
 function logout() {
     localStorage.removeItem('token');
@@ -184,7 +281,49 @@ function logout() {
     // Clear bookings from view without needing a full page refresh
     renderTable([]);
     
+    // Clear booking forms
+    clearBookingForms();
+    
     showNotification('Logged out successfully');
+}
+
+// Auto-fill booking forms with user data
+function autoFillBookingForms() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+
+    // Hotel form
+    if (document.getElementById('hotelName')) {
+        document.getElementById('hotelName').value = user.fullName || '';
+        document.getElementById('hotelEmail').value = user.email || '';
+        document.getElementById('hotelPassport').value = user.passportNum || '';
+        document.getElementById('hotelPhone').value = user.phone || '';
+    }
+
+    // Flight form
+    if (document.getElementById('flightName')) {
+        document.getElementById('flightName').value = user.fullName || '';
+        document.getElementById('flightEmail').value = user.email || '';
+        document.getElementById('flightPassport').value = user.passportNum || '';
+    }
+}
+
+// Clear booking forms
+function clearBookingForms() {
+    // Hotel form
+    if (document.getElementById('hotelName')) {
+        document.getElementById('hotelName').value = '';
+        document.getElementById('hotelEmail').value = '';
+        document.getElementById('hotelPassport').value = '';
+        document.getElementById('hotelPhone').value = '';
+    }
+
+    // Flight form
+    if (document.getElementById('flightName')) {
+        document.getElementById('flightName').value = '';
+        document.getElementById('flightEmail').value = '';
+        document.getElementById('flightPassport').value = '';
+    }
 }
 
 // Modal control functions
@@ -216,6 +355,28 @@ function switchToLogin(e) {
     e.preventDefault();
     closeRegisterModal();
     openLoginModal();
+}
+
+// Profile modal functions
+function openProfileModal() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        document.getElementById('profileUsername').value = user.username;
+        document.getElementById('profileEmail').value = user.email;
+        document.getElementById('profileFullName').value = user.fullName || '';
+        document.getElementById('profilePhone').value = user.phone || '';
+        document.getElementById('profilePassport').value = user.passportNum || '';
+        document.getElementById('profileModal').style.display = 'block';
+    }
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('profileError').style.display = 'none';
+    // Clear password fields
+    document.getElementById('profileCurrentPassword').value = '';
+    document.getElementById('profileNewPassword').value = '';
+    document.getElementById('profileConfirmPassword').value = '';
 }
 
 // Show notification
@@ -434,7 +595,7 @@ function renderTable(bookings) {
 }
 
 // ==========================================
-// 6. Form Handling (Create)
+// 6. Form Handling (Search Results)
 // ==========================================
 function initializeForms() {
     // Hotel Form
@@ -445,21 +606,8 @@ function initializeForms() {
             const formData = new FormData(hotelForm);
             const data = Object.fromEntries(formData.entries());
 
-            const nights = calculateDays(data.checkIn, data.checkOut) || 1;
-            const estimatedPrice = nights * 100 * (parseInt(data.guests) || 1);
-
-            const payload = {
-                travelerName: data.travelerName,
-                passportNum: data.passportNum,
-                destination: data.destination,
-                flightDate: data.checkIn,
-                hotelName: `Hotel in ${data.destination} (${data.roomType})`,
-                status: 'Confirmed',
-                price: estimatedPrice
-            };
-
-            await sendBookingData(payload, 'Hotel');
-            hotelForm.reset();
+            // Display hotel results
+            displayHotelResults(data);
         });
     }
 
@@ -471,24 +619,175 @@ function initializeForms() {
             const formData = new FormData(flightForm);
             const data = Object.fromEntries(formData.entries());
 
-            const passengers = parseInt(data.passengers) || 1;
-            const estimatedPrice = passengers * 300 + (data.class === 'business' ? 500 : 0);
-
-            const payload = {
-                travelerName: data.travelerName,
-                passportNum: data.passportNum,
-                destination: data.destination,
-                flightDate: data.flightDate,
-                hotelName: 'N/A',
-                status: 'Confirmed',
-                price: estimatedPrice
-            };
-
-            await sendBookingData(payload, 'Flight');
-            flightForm.reset();
+            // Display flight results
+            displayFlightResults(data);
         });
     }
 }
+
+// Generate mock hotel results
+function generateHotelResults(searchData) {
+    const hotelNames = ['Grand Palace Hotel', 'Luxury Resort & Spa', 'City Center Inn', 'Beachside Paradise', 'Mountain View Lodge'];
+    const ratings = [4.2, 4.5, 4.7, 4.8, 4.9];
+    const nights = calculateDays(searchData.checkIn, searchData.checkOut) || 1;
+    
+    return hotelNames.map((name, idx) => {
+        const basePrice = 80 + (idx * 40);
+        const guestMultiplier = parseInt(searchData.guests) || 1;
+        const roomTypeMultiplier = searchData.roomType === 'suite' ? 2 : searchData.roomType === 'deluxe' ? 1.5 : 1;
+        const pricePerNight = basePrice * roomTypeMultiplier;
+        const totalPrice = Math.round(pricePerNight * nights * guestMultiplier);
+
+        return {
+            name,
+            destination: searchData.destination,
+            rating: ratings[idx],
+            pricePerNight,
+            totalPrice,
+            roomType: searchData.roomType,
+            checkIn: searchData.checkIn,
+            checkOut: searchData.checkOut,
+            guests: searchData.guests,
+            travelerName: searchData.travelerName,
+            passportNum: searchData.passportNum,
+            nights
+        };
+    });
+}
+
+// Display hotel results
+function displayHotelResults(searchData) {
+    const resultsContainer = document.getElementById('hotelResults');
+    const resultsList = document.getElementById('hotelResultsList');
+    const hotels = generateHotelResults(searchData);
+
+    resultsList.innerHTML = hotels.map((hotel, idx) => `
+        <div class="result-card">
+            <div class="result-header">
+                <h4>${hotel.name}</h4>
+                <div class="rating">⭐ ${hotel.rating}</div>
+            </div>
+            <div class="result-details">
+                <p><strong>Location:</strong> ${hotel.destination}</p>
+                <p><strong>Room Type:</strong> ${hotel.roomType.charAt(0).toUpperCase() + hotel.roomType.slice(1)}</p>
+                <p><strong>Check-in:</strong> ${new Date(hotel.checkIn).toLocaleDateString()} | <strong>Check-out:</strong> ${new Date(hotel.checkOut).toLocaleDateString()}</p>
+                <p><strong>Guests:</strong> ${hotel.guests} | <strong>Nights:</strong> ${hotel.nights}</p>
+            </div>
+            <div class="result-footer">
+                <div class="price-info">
+                    <span class="price-per-night">$${hotel.pricePerNight}/night</span>
+                    <span class="total-price">Total: $${hotel.totalPrice}</span>
+                </div>
+                <button class="btn btn-primary" onclick="bookHotel(${idx})">Book Now</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Store search data for booking
+    window.currentHotelSearch = hotels;
+
+    resultsContainer.style.display = 'block';
+    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Generate mock flight results
+function generateFlightResults(searchData) {
+    const airlines = ['SkyWings Airlines', 'Global Air', 'Pacific Airways', 'Continental Express', 'Horizon Flights'];
+    const times = [['08:00', '11:30'], ['10:45', '14:15'], ['13:20', '16:50'], ['16:00', '19:30'], ['19:45', '23:15']];
+    
+    return airlines.map((airline, idx) => {
+        const basePrice = 200 + (idx * 50);
+        const passengers = parseInt(searchData.passengers) || 1;
+        const classMultiplier = searchData.class === 'first' ? 3 : searchData.class === 'business' ? 2 : 1;
+        const pricePerPerson = basePrice * classMultiplier;
+        const totalPrice = Math.round(pricePerPerson * passengers);
+
+        return {
+            airline,
+            from: searchData.from,
+            destination: searchData.destination,
+            departureTime: times[idx][0],
+            arrivalTime: times[idx][1],
+            flightDate: searchData.flightDate,
+            class: searchData.class,
+            passengers: searchData.passengers,
+            pricePerPerson,
+            totalPrice,
+            travelerName: searchData.travelerName,
+            passportNum: searchData.passportNum,
+            tripType: searchData.tripType,
+            returnDate: searchData.return
+        };
+    });
+}
+
+// Display flight results
+function displayFlightResults(searchData) {
+    const resultsContainer = document.getElementById('flightResults');
+    const resultsList = document.getElementById('flightResultsList');
+    const flights = generateFlightResults(searchData);
+
+    resultsList.innerHTML = flights.map((flight, idx) => `
+        <div class="result-card">
+            <div class="result-header">
+                <h4>${flight.airline}</h4>
+                <div class="flight-class">${flight.class.charAt(0).toUpperCase() + flight.class.slice(1)} Class</div>
+            </div>
+            <div class="result-details">
+                <p><strong>Route:</strong> ${flight.from} → ${flight.destination}</p>
+                <p><strong>Departure:</strong> ${new Date(flight.flightDate).toLocaleDateString()} at ${flight.departureTime}</p>
+                <p><strong>Arrival:</strong> ${flight.arrivalTime} (same day)</p>
+                <p><strong>Passengers:</strong> ${flight.passengers}</p>
+                ${flight.tripType === 'roundtrip' && flight.returnDate ? `<p><strong>Return:</strong> ${new Date(flight.returnDate).toLocaleDateString()}</p>` : ''}
+            </div>
+            <div class="result-footer">
+                <div class="price-info">
+                    <span class="price-per-night">$${flight.pricePerPerson}/person</span>
+                    <span class="total-price">Total: $${flight.totalPrice}</span>
+                </div>
+                <button class="btn btn-primary" onclick="bookFlight(${idx})">Book Now</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Store search data for booking
+    window.currentFlightSearch = flights;
+
+    resultsContainer.style.display = 'block';
+    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Book selected hotel
+window.bookHotel = async function(index) {
+    const hotel = window.currentHotelSearch[index];
+    const payload = {
+        travelerName: hotel.travelerName,
+        passportNum: hotel.passportNum,
+        destination: hotel.destination,
+        flightDate: hotel.checkIn,
+        hotelName: `${hotel.name} (${hotel.roomType})`,
+        status: 'Confirmed',
+        price: hotel.totalPrice
+    };
+
+    await sendBookingData(payload, 'Hotel');
+};
+
+// Book selected flight
+window.bookFlight = async function(index) {
+    const flight = window.currentFlightSearch[index];
+    const payload = {
+        travelerName: flight.travelerName,
+        passportNum: flight.passportNum,
+        destination: flight.destination,
+        flightDate: flight.flightDate,
+        hotelName: `${flight.airline} Flight`,
+        status: 'Confirmed',
+        price: flight.totalPrice
+    };
+
+    await sendBookingData(payload, 'Flight');
+};
 
 async function sendBookingData(payload, type) {
     const token = localStorage.getItem('token');

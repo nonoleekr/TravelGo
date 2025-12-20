@@ -56,6 +56,21 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 6
     },
+    fullName: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    phone: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    passportNum: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -197,6 +212,78 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     }
 });
 
+// Update user profile
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+    try {
+        const { username, email, fullName, phone, passportNum, currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update username if provided
+        if (username && username !== user.username) {
+            // Check if username is already taken by another user
+            const existingUser = await User.findOne({ username, _id: { $ne: user._id } });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Username already in use' });
+            }
+            if (username.length < 3) {
+                return res.status(400).json({ message: 'Username must be at least 3 characters' });
+            }
+            user.username = username;
+        }
+
+        // Update email if provided
+        if (email && email !== user.email) {
+            // Check if email is already taken by another user
+            const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+            user.email = email;
+        }
+
+        // Update personal info
+        if (fullName !== undefined) user.fullName = fullName;
+        if (phone !== undefined) user.phone = phone;
+        if (passportNum !== undefined) user.passportNum = passportNum;
+
+        // Update password if provided
+        if (currentPassword && newPassword) {
+            // Verify current password
+            const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+            if (!isValidPassword) {
+                return res.status(401).json({ message: 'Current password is incorrect' });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({ message: 'New password must be at least 6 characters' });
+            }
+
+            // Hash and update new password
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        await user.save();
+
+        res.json({
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                fullName: user.fullName,
+                phone: user.phone,
+                passportNum: user.passportNum
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error: ' + err.message });
+    }
+});
+
 // ---------------------------------------------------------
 // Route: Get All Destinations
 // ---------------------------------------------------------
@@ -248,9 +335,6 @@ const bookingSchema = new mongoose.Schema({
         default: 0
     }
 });
-
-// Compound unique index - each user can have unique passport numbers
-bookingSchema.index({ userId: 1, passportNum: 1 }, { unique: true });
 
 // Create the Model
 const Booking = mongoose.model('Booking', bookingSchema);

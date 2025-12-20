@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, trim: true, minlength: 3 },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
+    fullName: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    passportNum: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
@@ -45,7 +48,6 @@ const bookingSchema = new mongoose.Schema({
     },
     price: { type: Number, min: 0, default: 0 }
 });
-bookingSchema.index({ userId: 1, passportNum: 1 }, { unique: true });
 const Booking = mongoose.model('Booking', bookingSchema);
 
 // ==========================================
@@ -53,14 +55,14 @@ const Booking = mongoose.model('Booking', bookingSchema);
 // ==========================================
 
 const sampleUsers = [
-    { username: "alice_wonder", email: "alice@example.com", password: "password123" },
-    { username: "bob_builder", email: "bob@example.com", password: "password123" },
-    { username: "charlie_brown", email: "charlie@example.com", password: "password123" },
-    { username: "diana_prince", email: "diana@example.com", password: "password123" },
-    { username: "edward_elric", email: "edward@example.com", password: "password123" },
-    { username: "fiona_green", email: "fiona@example.com", password: "password123" },
-    { username: "george_martin", email: "george@example.com", password: "password123" },
-    { username: "hannah_jones", email: "hannah@example.com", password: "password123" }
+    { username: "alice_wonder", email: "alice@example.com", password: "password123", fullName: "Alice Wonder", phone: "+1-555-0101", passportNum: "P1234567" },
+    { username: "bob_builder", email: "bob@example.com", password: "password123", fullName: "Bob Builder", phone: "+1-555-0102", passportNum: "P2345678" },
+    { username: "charlie_brown", email: "charlie@example.com", password: "password123", fullName: "Charlie Brown", phone: "+1-555-0103", passportNum: "P3456789" },
+    { username: "diana_prince", email: "diana@example.com", password: "password123", fullName: "Diana Prince", phone: "+1-555-0104", passportNum: "P4567890" },
+    { username: "edward_elric", email: "edward@example.com", password: "password123", fullName: "Edward Elric", phone: "+1-555-0105", passportNum: "P5678901" },
+    { username: "fiona_green", email: "fiona@example.com", password: "password123", fullName: "Fiona Green", phone: "+1-555-0106", passportNum: "P6789012" },
+    { username: "george_martin", email: "george@example.com", password: "password123", fullName: "George Martin", phone: "+1-555-0107", passportNum: "P7890123" },
+    { username: "hannah_jones", email: "hannah@example.com", password: "password123", fullName: "Hannah Jones", phone: "+1-555-0108", passportNum: "P8901234" }
 ];
 
 const sampleDestinations = [
@@ -81,7 +83,8 @@ const sampleDestinations = [
 const sampleBookings = [
     {
         travelerName: "Alice Wonder",
-        passportNum: "A10021626",
+        passportNum: "P1234567",
+        phone: "+1-555-0101",
         destination: "Tokyo, Japan",
         flightDate: new Date("2025-12-01"),
         hotelName: "Shinjuku Granbell Hotel",
@@ -90,7 +93,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Bob Builder",
-        passportNum: "B10293847",
+        passportNum: "P2345678",
+        phone: "+1-555-0102",
         destination: "Paris, France",
         flightDate: new Date("2025-11-15"),
         hotelName: "Hotel Ritz Paris",
@@ -99,7 +103,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Charlie Brown",
-        passportNum: "C10025775",
+        passportNum: "P3456789",
+        phone: "+1-555-0103",
         destination: "New York, USA",
         flightDate: new Date("2026-01-10"),
         hotelName: "The Plaza",
@@ -108,7 +113,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Diana Prince",
-        passportNum: "D10023717",
+        passportNum: "P4567890",
+        phone: "+1-555-0104",
         destination: "Seoul, South Korea",
         flightDate: new Date("2025-10-20"),
         hotelName: "Lotte Hotel Seoul",
@@ -117,7 +123,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Edward Elric",
-        passportNum: "E99887766",
+        passportNum: "P5678901",
+        phone: "+1-555-0105",
         destination: "London, UK",
         flightDate: new Date("2025-09-05"),
         hotelName: "The Savoy",
@@ -126,7 +133,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Fiona Green",
-        passportNum: "F55664433",
+        passportNum: "P6789012",
+        phone: "+1-555-0106",
         destination: "Rome, Italy",
         flightDate: new Date("2025-12-25"),
         hotelName: "Continental Hotel",
@@ -135,7 +143,8 @@ const sampleBookings = [
     },
     {
         travelerName: "George Martin",
-        passportNum: "G11223344",
+        passportNum: "P7890123",
+        phone: "+1-555-0107",
         destination: "Malibu, USA",
         flightDate: new Date("2025-08-15"),
         hotelName: "N/A",
@@ -144,7 +153,8 @@ const sampleBookings = [
     },
     {
         travelerName: "Hannah Jones",
-        passportNum: "H99882211",
+        passportNum: "P8901234",
+        phone: "+1-555-0108",
         destination: "Venice, Italy",
         flightDate: new Date("2025-07-01"),
         hotelName: "Hotel Danieli",

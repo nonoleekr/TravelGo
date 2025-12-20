@@ -431,14 +431,17 @@ footer {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
 }
 
 .modal-content {
     background-color: var(--white);
-    margin: 5% auto;
+    margin: 3% auto;
     padding: 0;
     border-radius: 12px;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: var(--shadow-lg);
     animation: slideIn 0.3s;
 }
@@ -503,6 +506,99 @@ footer {
 }
 
 #bookingDetails strong {
+    color: var(--primary-color);
+}
+
+/* Search Results Styles */
+.results-container {
+    margin-top: 3rem;
+}
+
+.results-title {
+    font-size: 1.8rem;
+    color: var(--dark-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.results-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.result-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--light-color);
+}
+
+.result-header h4 {
+    font-size: 1.3rem;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.rating, .flight-class {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.result-details {
+    margin-bottom: 1.5rem;
+}
+
+.result-details p {
+    margin: 0.5rem 0;
+    color: var(--gray-color);
+    font-size: 0.95rem;
+}
+
+.result-details strong {
+    color: var(--dark-color);
+}
+
+.result-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 2px solid var(--light-color);
+}
+
+.price-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-per-night {
+    font-size: 0.85rem;
+    color: var(--gray-color);
+}
+
+.total-price {
+    font-size: 1.2rem;
+    font-weight: 700;
     color: var(--primary-color);
 }
 
