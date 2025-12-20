@@ -284,6 +284,23 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
     }
 });
 
+// Delete user account
+app.delete('/api/auth/account', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Delete all bookings for this user
+        await Booking.deleteMany({ userId });
+
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+
+        res.json({ message: 'Account deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error: ' + err.message });
+    }
+});
+
 // ---------------------------------------------------------
 // Route: Get All Destinations
 // ---------------------------------------------------------

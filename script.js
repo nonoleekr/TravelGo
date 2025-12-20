@@ -379,6 +379,71 @@ function closeProfileModal() {
     document.getElementById('profileConfirmPassword').value = '';
 }
 
+// Confirm and delete account
+function confirmDeleteAccount() {
+    const confirmation = confirm(
+        '⚠️ WARNING: This will permanently delete your account and all bookings.\n\n' +
+        'This action cannot be undone.\n\n' +
+        'Are you sure you want to delete your account?'
+    );
+    
+    if (confirmation) {
+        const finalConfirmation = confirm(
+            'Final confirmation: Type your confirmation by clicking OK to proceed with account deletion.'
+        );
+        
+        if (finalConfirmation) {
+            deleteAccount();
+        }
+    }
+}
+
+// Delete account
+async function deleteAccount() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${AUTH_API_URL}/account`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Clear local storage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Close modal
+            closeProfileModal();
+            
+            // Update UI
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            if (authButtons && userInfo) {
+                authButtons.style.display = 'flex';
+                userInfo.style.display = 'none';
+            }
+            
+            // Clear bookings
+            renderTable([]);
+            clearBookingForms();
+            
+            // Show success message
+            showNotification('Account deleted successfully');
+        } else {
+            showNotification('Failed to delete account: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Delete account error:', error);
+        showNotification('Network error. Please try again.');
+    }
+}
+
 // Show notification
 function showNotification(message) {
     // Create notification element
